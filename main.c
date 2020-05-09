@@ -28,10 +28,12 @@
 
 
 char operator[8];
-char transOpt[4];
 char operand[3][8];
+char transOpt[4];
 char transOpd[12];
-char output[16];
+char number[9];
+char input[16];
+char output[17];
 
 int numberOfOperands;
 int offset;
@@ -119,7 +121,7 @@ void operandTranslater(char opd[]) {
 
 
 void decimalToBinary(char *opd) {
-    char number[9];
+
     int n, c, k;
     for (int i = 1; i < strlen(opd); ++i) {
         number[i-1] = opd[i];
@@ -136,60 +138,83 @@ void decimalToBinary(char *opd) {
     }
 }
 
-
-
-
-int main(void) {
-    int i;
-    char input[16];
-    printf("Input an LC3 assembly instruction:\n");
-    gets(input);
-
-    for (i = 0; i < strlen(input) ; ++i) {
-        if (input[i] != ' ') {
-            operator[i] = input[i];
-        } else {
-            break;
+void checkADD(int i) {
+    if (strcmp(operator, "ADD") == 0 && i == 2) { // Checks for immediate or register version of add
+        if (operand[i][0] == 'R') {
+            strcat(output, "000");
+        } else if (operand[i][0] == '#') {
+            strcat(output, "1");
         }
     }
+}
 
-    operatorTranslater(operator);
+void clear() {
+    memset(operator, '\0', sizeof(operator));
+    memset(operand[0], '\0', sizeof(operand[0]));
+    memset(operand[1], '\0', sizeof(operand[1]));
+    memset(operand[2], '\0', sizeof(operand[2]));
+    memset(transOpt, '\0', sizeof(transOpt));
+    memset(transOpd, '\0', sizeof(transOpd));
+    memset(number, '\0', sizeof(number));
+    memset(input, '\0', sizeof(input));
+    memset(output, '\0', sizeof(output));
+}
 
-    // Storing Operands in array / matrix
-    int j = i+1;
-    i = 0;
-    for (int k = 0; k < numberOfOperands; ++k) {
-        for (j = j; j < strlen(input); ++j) {
-            if (input[j] != ' ') {
-                operand[k][i] = input[j];
-                i++;
+int main(void) {
+    int i, j;
+
+
+    while (1) {
+        clear();
+        printf("Input an LC3 assembly instruction:\n");
+        gets(input);
+
+        if (strcmp(input, "EXIT") == 0) {
+            return 0;
+        }
+
+        for (i = 0; i < strlen(input); ++i) {
+            if (input[i] != ' ') {
+                operator[i] = input[i];
             } else {
-                j++;
-                i = 0;
                 break;
             }
         }
-    }
 
-    // Loop to translate the operands
-    for (int l = 0; l < numberOfOperands; ++l) {
-        if (strcmp(operator, "ADD") == 0 && l == 2) {
-            if (operand[l][0] == 'R') {
-                strcat(output, 000);
-            } else if (operand[l][0] == '#') {
-                strcat(output,"1");
+        operatorTranslater(operator);
+
+        // Storing Operands in array / matrix
+        j = i + 1;
+        i = 0;
+        for (int k = 0; k < numberOfOperands; ++k) {
+            for (j = j; j < strlen(input); ++j) {
+                if (input[j] != ' ') {
+                    operand[k][i] = input[j];
+                    i++;
+                } else {
+                    j++;
+                    i = 0;
+                    break;
+                }
             }
         }
-        operandTranslater(operand[l]);
+
+        // Loop to translate the operands
+        for (int l = 0; l < numberOfOperands; ++l) {
+            checkADD(l);
+            operandTranslater(operand[l]);
+        }
+
+        // Add NOTOFFSET if the operator is 'NOT'
+        if (strcmp(operator, "NOT") == 0) {
+            sprintf(transOpd, "%s", NOTOFFSET);
+            strcat(output, transOpd);
+        }
+
+        // Makes sure nothing extra gets printed
+        output[16] = '\0';
+
+        // Prints the final machine code
+        printf("%s\n\n", output);
     }
-
-    // Add NOTOFFSET if the operator is 'NOT'
-    if (strcmp(operator, "NOT") == 0) {
-        sprintf(transOpd, "%s", NOTOFFSET);
-        strcat(output, transOpd);
-    }
-
-    // Prints the final machine code
-    printf("%s", output);
-
 }
