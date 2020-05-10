@@ -1,21 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+
+
 int main() {
-    char str[20];
 
-    strcpy(str, "a");
-    strcat(str, "b");
-    strcat(str, "c");
-    strcat(str, "d");
-    //printf("%s", str);
-    //printf("\n");
+    FILE *wFile;
+    wFile = fopen("/Users/kehan_000/ClionProjects/Project/tmp/assemblycode.txt", "w+");
+    fprintf(wFile, "Test 1 2 3\n");
+    fputs("3 2 1 tseT\n", wFile);
+    fclose(wFile);
 
-    str[0] = '\0';
-    strcpy(str, "x");
-    strcat(str, "y");
-    strcat(str, "z");
-    printf("%s", str);
 
-    return 0;
+    return 1;
 }

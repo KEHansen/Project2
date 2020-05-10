@@ -166,7 +166,6 @@ void clear() {
 int main(void) {
 
     int i, j;
-    FILE *fopen("", r);
 
 
     while (1) {
