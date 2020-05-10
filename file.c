@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 // Defining all of the registers
 #define R0 "000"
 #define R1 "001"
@@ -25,24 +24,31 @@
 #define OFFSET6 "000000"
 #define PCOFFSET9 "000000000"
 
-
-
+// Defining file paths
+#define personalPath "C:/Users/kehan_000/" // Remember to change to personal path
+#define readPath "ClionProjects/Project2/tmp/assemblycode.txt"
+#define writePath "ClionProjects/Project2/tmp/machinecode.txt"
 
 char operator[8];
 char operand[3][8];
 char transOpt[4];
 char transOpd[12];
 char number[9];
-char input[16];
 char output[17];
 
 int numberOfOperands;
 int offset;
 
+char rfp[100];
+char wfp[100];
 
-void decimalToBinary(char *opd);
+FILE *rf;
+FILE *wf;
+
 
 void determineBR(char *opt);
+
+void decimalToBinary(char *opd);
 
 // Translates the operator and determines the offset and the number of operands for the given operator
 void operatorTranslater(char opt[]) {
@@ -75,6 +81,8 @@ void operatorTranslater(char opt[]) {
     }
     strcpy(output, transOpt);
 }
+
+
 
 void determineBR(char *opt) {
     if (strcmp(opt,"BRnzp") == 0) {
@@ -121,6 +129,8 @@ void operandTranslater(char opd[]) {
     strcat(output, transOpd);
 }
 
+
+
 // Converts decimal number into binary in the length of the given offset
 void decimalToBinary(char *opd) {
     int n, c, k;
@@ -159,53 +169,50 @@ void clear() {
     memset(transOpt, '\0', sizeof(transOpt));
     memset(transOpd, '\0', sizeof(transOpd));
     memset(number, '\0', sizeof(number));
-    memset(input, '\0', sizeof(input));
     memset(output, '\0', sizeof(output));
+}
+
+void openFiles() {
+    strcpy(rfp, personalPath);
+    strcat(rfp, readPath);
+    rf = fopen(rfp, "r");
+
+    strcpy(wfp, personalPath);
+    strcat(wfp, writePath);
+    wf = fopen(wfp, "w");
+}
+
+void closeFiles() {
+    fclose(rf);
+    fclose(wf);
 }
 
 int main(void) {
 
-    int i, j;
-
+    openFiles();
 
     while (1) {
 
-        gets(input);
+        clear();
 
-        if (strcmp(input, "EXIT") == 0) { // Stops the program if 'true'
+        fscanf(rf, "%s", operator);
+
+        if (strcmp(operator, "") == 0) { // Stops the program if 'true'
+            closeFiles();
             return 0;
-        }
-
-        for (i = 0; i < strlen(input); ++i) { // Stores the operator
-            if (input[i] != ' ') {
-                operator[i] = input[i];
-            } else {
-                break;
-            }
         }
 
         operatorTranslater(operator);
 
         // Storing Operands in array / matrix
-        j = i + 1;
-        i = 0;
-        for (int k = 0; k < numberOfOperands; ++k) {
-            for (j = j; j < strlen(input); ++j) {
-                if (input[j] != ' ') {
-                    operand[k][i] = input[j];
-                    i++;
-                } else {
-                    j++;
-                    i = 0;
-                    break;
-                }
-            }
+        for (int i = 0; i < numberOfOperands; ++i) {
+            fscanf(rf, "%s", operand[i]);
         }
 
         // Loop to translate the operands
-        for (int l = 0; l < numberOfOperands; ++l) {
-            checkADD(l);
-            operandTranslater(operand[l]);
+        for (int i = 0; i < numberOfOperands; ++i) {
+            checkADD(i);
+            operandTranslater(operand[i]);
         }
 
         // Add NOTOFFSET if the operator is 'NOT'
@@ -218,6 +225,6 @@ int main(void) {
         output[16] = '\0';
 
         // Prints the final machine code
-        printf("%s\n\n", output);
+        fprintf(wf, "%s\n", output);
     }
 }

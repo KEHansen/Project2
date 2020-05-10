@@ -1,0 +1,7 @@
+ADD R0 R0 #-12
+ADD R1 R0 #4
+LD R2 #7
+LDR R3 R2 #-5
+NOT R4 R2
+ST R7 #20
+BRnz
