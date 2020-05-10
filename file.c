@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 // Defining all of the registers
 #define R0 "000"
 #define R1 "001"
@@ -165,10 +166,11 @@ void clear() {
 int main(void) {
 
     int i, j;
+    FILE *fopen("", r);
+
 
     while (1) {
-        clear();
-        printf("Input an LC3 assembly instruction:\n");
+
         gets(input);
 
         if (strcmp(input, "EXIT") == 0) { // Stops the program if 'true'
