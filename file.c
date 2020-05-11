@@ -39,11 +39,11 @@ char output[17];
 int numberOfOperands;
 int offset;
 
-char rfp[100];
-char wfp[100];
+char readFilePath[100];
+char writeFilePath[100];
 
-FILE *rf;
-FILE *wf;
+FILE *readFile;
+FILE *writeFile;
 
 
 void determineBR(char *opt);
@@ -173,18 +173,18 @@ void clear() {
 }
 
 void openFiles() {
-    strcpy(rfp, personalPath);
-    strcat(rfp, readPath);
-    rf = fopen(rfp, "r");
+    strcpy(readFilePath, personalPath);
+    strcat(readFilePath, readPath);
+    readFile = fopen(readFilePath, "r");
 
-    strcpy(wfp, personalPath);
-    strcat(wfp, writePath);
-    wf = fopen(wfp, "w");
+    strcpy(writeFilePath, personalPath);
+    strcat(writeFilePath, writePath);
+    writeFile = fopen(writeFilePath, "w");
 }
 
 void closeFiles() {
-    fclose(rf);
-    fclose(wf);
+    fclose(readFile);
+    fclose(writeFile);
 }
 
 int main(void) {
@@ -195,7 +195,7 @@ int main(void) {
 
         clear();
 
-        fscanf(rf, "%s", operator);
+        fscanf(readFile, "%s", operator);
 
         if (strcmp(operator, "") == 0) { // Stops the program if 'true'
             closeFiles();
@@ -206,7 +206,7 @@ int main(void) {
 
         // Storing Operands in array / matrix
         for (int i = 0; i < numberOfOperands; ++i) {
-            fscanf(rf, "%s", operand[i]);
+            fscanf(readFile, "%s", operand[i]);
         }
 
         // Loop to translate the operands
@@ -225,6 +225,6 @@ int main(void) {
         output[16] = '\0';
 
         // Prints the final machine code
-        fprintf(wf, "%s\n", output);
+        fprintf(writeFile, "%s\n", output);
     }
 }
