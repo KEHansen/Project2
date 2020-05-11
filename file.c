@@ -23,6 +23,7 @@
 #define NOTOFFSET "111111"
 #define OFFSET6 "000000"
 #define PCOFFSET9 "000000000"
+#define END "0000000000000000"
 
 // Defining file paths
 #define personalPath "C:/Users/kehan_000/" // Remember to change to personal path
@@ -36,9 +37,14 @@ char transOpd[12];
 char decimal[9];
 char hex[5];
 char output[17];
+char Sblkw[8];
+char stringz[64];
+char stringzReady[64];
 
 int numberOfOperands;
 int offset;
+int Nblkw;
+int decimalNumber;
 
 char readFilePath[100];
 char writeFilePath[100];
@@ -49,9 +55,13 @@ FILE *writeFile;
 
 void determineBR(char *opt);
 
-void decimalToBinary(char *opd);
+void decimalToBinary(int n);
 
 void hexToBinary(char *opd);
+
+void BLKW();
+
+void STRINGZ();
 
 // Translates the operator and determines the offset and the number of operands for the given operator
 void operatorTranslater(char opt[]) {
@@ -84,18 +94,39 @@ void operatorTranslater(char opt[]) {
     } else if (strcmp(operator, ".ORIG") == 0) {
         numberOfOperands = 1;
     } else if (strcmp(operator, ".BLKW") == 0) {
-
+        BLKW();
     } else if (strcmp(operator, ".FILL") == 0) {
-
+        numberOfOperands = 1;
+        offset = 16;
     } else if (strcmp(operator, ".STRINGZ") == 0) {
-
+        offset = 16;
+        STRINGZ();
+        return;
     } else if (strcmp(operator, ".END") == 0) {
-
+        sprintf(transOpt, "%s", END);
     }
     strcpy(output, transOpt);
 }
 
-
+void STRINGZ() {
+    fgets(stringz, sizeof(stringz), readFile);
+    int j = 0;
+    int true = 0;
+    for (int i = 0; i < strlen(stringz); ++i) {
+        if (stringz[i] == '"') {
+            true += 1;
+        } else if (true % 2 == 1) {
+            stringzReady[j] = stringz[i];
+            j++;
+        }
+    }
+    decimalToBinary((int)stringzReady[0]);
+    for (int i = 1; i < strlen(stringzReady); ++i) {
+        fprintf(writeFile, "%s\n", output);
+        memset(output, '\0', sizeof(output));
+        decimalToBinary((int)stringzReady[i]);
+    }
+}
 
 void determineBR(char *opt) {
     if (strcmp(opt,"BRnzp") == 0) {
@@ -114,6 +145,19 @@ void determineBR(char *opt) {
         strcat(output, "001");
     } else if (strcmp(opt,"BR") == 0) {
         strcat(output, "000");
+    }
+}
+
+void BLKW() {
+    fscanf(readFile, "%s", operand[0]);
+    for (int i = 1; i < strlen(operand[0]); ++i) { // Removes the hashtag from the string
+        Sblkw[i-1] = operand[0][i];
+    }
+    sscanf(Sblkw, "%d", &Nblkw);
+    sprintf(transOpt, "%s", END);
+    strcpy(output, transOpt);
+    for (int i = 0; i < Nblkw - 1; ++i) {
+        fprintf(writeFile, "%s\n", output);
     }
 }
 
@@ -136,7 +180,11 @@ void operandTranslater(char opd[]) {
     } else if (strcmp(opd, "R7") == 0) {
         sprintf(transOpd, "%s", R7);
     } else if (opd[0] == '#'){
-        decimalToBinary(opd);
+        for (int i = 1; i < strlen(opd); ++i) { // Removes the hashtag from the string
+            decimal[i-1] = opd[i];
+        }
+        sscanf(decimal, "%d", &decimalNumber); // Converts the string to an integer
+        decimalToBinary(decimalNumber);
         return;
     } else if (opd[0] == 'x') {
         hexToBinary(opd);
@@ -146,12 +194,9 @@ void operandTranslater(char opd[]) {
 }
 
 // Converts decimal number into binary in the length of the given offset
-void decimalToBinary(char *opd) {
-    int n, c, k;
-    for (int i = 1; i < strlen(opd); ++i) { // Removes the hashtag from the string
-        decimal[i-1] = opd[i];
-    }
-    sscanf(decimal, "%d", &n); // Converts the string to an integer
+void decimalToBinary(int n) {
+    int c, k;
+
     for (c = offset - 1; c >= 0; c--)
     {
         k = n >> c;
@@ -260,6 +305,8 @@ void clear() {
     memset(decimal, '\0', sizeof(decimal));
     memset(hex, '\0', sizeof(hex));
     memset(output, '\0', sizeof(output));
+    numberOfOperands = 0;
+    offset = 0;
 }
 
 void openFiles() {
