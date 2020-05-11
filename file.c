@@ -33,7 +33,8 @@ char operator[8];
 char operand[3][8];
 char transOpt[4];
 char transOpd[12];
-char number[9];
+char decimal[9];
+char hex[5];
 char output[17];
 
 int numberOfOperands;
@@ -49,6 +50,8 @@ FILE *writeFile;
 void determineBR(char *opt);
 
 void decimalToBinary(char *opd);
+
+void hexToBinary(char *opd);
 
 // Translates the operator and determines the offset and the number of operands for the given operator
 void operatorTranslater(char opt[]) {
@@ -78,6 +81,16 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", PCOFFSET9);
         strcat(output, transOpt);
         return;
+    } else if (strcmp(operator, ".ORIG") == 0) {
+        numberOfOperands = 1;
+    } else if (strcmp(operator, ".BLKW") == 0) {
+
+    } else if (strcmp(operator, ".FILL") == 0) {
+
+    } else if (strcmp(operator, ".STRINGZ") == 0) {
+
+    } else if (strcmp(operator, ".END") == 0) {
+
     }
     strcpy(output, transOpt);
 }
@@ -125,19 +138,20 @@ void operandTranslater(char opd[]) {
     } else if (opd[0] == '#'){
         decimalToBinary(opd);
         return;
+    } else if (opd[0] == 'x') {
+        hexToBinary(opd);
+        return;
     }
     strcat(output, transOpd);
 }
-
-
 
 // Converts decimal number into binary in the length of the given offset
 void decimalToBinary(char *opd) {
     int n, c, k;
     for (int i = 1; i < strlen(opd); ++i) { // Removes the hashtag from the string
-        number[i-1] = opd[i];
+        decimal[i-1] = opd[i];
     }
-    sscanf(number, "%d", &n); // Converts the string to an integer
+    sscanf(decimal, "%d", &n); // Converts the string to an integer
     for (c = offset - 1; c >= 0; c--)
     {
         k = n >> c;
@@ -146,6 +160,81 @@ void decimalToBinary(char *opd) {
             strcat(output, "1");
         else
             strcat(output, "0");
+    }
+}
+
+void hexToBinary(char *opd) {
+
+    for (int i = 1; i < strlen(opd); ++i) { // Removes the hashtag from the string
+        hex[i-1] = opd[i];
+    }
+
+    for (int i = 0; strlen(hex) != sizeof(hex) - 1; ++i) {
+        hex[3] = hex[2];
+        hex[2] = hex[1];
+        hex[1] = hex[0];
+        hex[0] = '0';
+    }
+
+    for (int i = 0; i < strlen(hex); i++)
+    {
+        switch(hex[i])
+        {
+            case '0':
+                strcat(output, "0000");
+                break;
+            case '1':
+                strcat(output, "0001");
+                break;
+            case '2':
+                strcat(output, "0010");
+                break;
+            case '3':
+                strcat(output, "0011");
+                break;
+            case '4':
+                strcat(output, "0100");
+                break;
+            case '5':
+                strcat(output, "0101");
+                break;
+            case '6':
+                strcat(output, "0110");
+                break;
+            case '7':
+                strcat(output, "0111");
+                break;
+            case '8':
+                strcat(output, "1000");
+                break;
+            case '9':
+                strcat(output, "1001");
+                break;
+            case 'a':
+            case 'A':
+                strcat(output, "1010");
+                break;
+            case 'b':
+            case 'B':
+                strcat(output, "1011");
+                break;
+            case 'c':
+            case 'C':
+                strcat(output, "1100");
+                break;
+            case 'd':
+            case 'D':
+                strcat(output, "1101");
+                break;
+            case 'e':
+            case 'E':
+                strcat(output, "1110");
+                break;
+            case 'f':
+            case 'F':
+                strcat(output, "1111");
+                break;
+        }
     }
 }
 
@@ -168,7 +257,8 @@ void clear() {
     memset(operand[2], '\0', sizeof(operand[2]));
     memset(transOpt, '\0', sizeof(transOpt));
     memset(transOpd, '\0', sizeof(transOpd));
-    memset(number, '\0', sizeof(number));
+    memset(decimal, '\0', sizeof(decimal));
+    memset(hex, '\0', sizeof(hex));
     memset(output, '\0', sizeof(output));
 }
 
