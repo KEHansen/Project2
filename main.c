@@ -144,8 +144,8 @@ void decimalToBinary(char *opd) {
 }
 
 // Checks for immediate or register version of add
-void checkADD(int i) {
-    if (strcmp(operator, "ADD") == 0 && i == 2) {
+void checkADD_AND(int i) {
+    if ((strcmp(operator, "ADD") == 0 || strcmp(operator, "AND") == 0) && i == 2) {
         if (operand[i][0] == 'R') {
             strcat(output, "000");
         } else if (operand[i][0] == '#') {
@@ -154,16 +154,6 @@ void checkADD(int i) {
     }
 }
 
-// Checks for immediate or register version of add
- void checkAND(int i) {
-     if (strcmp(operator, "AND") == 0 && i == 2) {
-         if (operand[i][0] == 'R') {
-             strcat(output, "000");
-         } else if (operand[i][0] == '#') {
-             strcat(output, "1");
-         }
-     }
- }
 
 
 // Clears all of the character arrays (strings)
@@ -220,8 +210,7 @@ int main(void) {
 
         // Loop to translate the operands
         for (int l = 0; l < numberOfOperands; ++l) {
-            checkADD (l);
-            //checkAND(1);
+            checkADD_AND(l);
             operandTranslater(operand[l]);
         }
 

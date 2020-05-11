@@ -1,3 +1,1 @@
-.ORIG x3000
-.STRINGZ "BANAN"
-.END
+LD R1 #-3
