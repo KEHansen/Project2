@@ -25,7 +25,7 @@
 #define PCOFFSET9 "000000000"
 
 // Defining file paths
-#define personalPath "C:/Users/kehan_000/" // Remember to change to personal path
+#define personalPath "C:/Users/Simon Fridolf/" // Remember to change to personal path
 #define readPath "ClionProjects/Project2/tmp/assemblycode.txt"
 #define writePath "ClionProjects/Project2/tmp/machinecode.txt"
 
@@ -81,6 +81,9 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", PCOFFSET9);
         strcat(output, transOpt);
         return;
+
+        /* The additional assembler directives that needs to be implemented in order to communicate with an LC3
+            assembler file */
     } else if (strcmp(operator, ".ORIG") == 0) {
         numberOfOperands = 1;
     } else if (strcmp(operator, ".BLKW") == 0) {
@@ -162,14 +165,14 @@ void decimalToBinary(char *opd) {
             strcat(output, "0");
     }
 }
-
+// Function that translate hex to binary
 void hexToBinary(char *opd) {
 
-    for (int i = 1; i < strlen(opd); ++i) { // Removes the hashtag from the string
+    for (int i = 1; i < strlen(opd); ++i) { // Removes the x from the .Orig
         hex[i-1] = opd[i];
     }
 
-    for (int i = 0; strlen(hex) != sizeof(hex) - 1; ++i) {
+    for (int i = 0; strlen(hex) != sizeof(hex) - 1; ++i) {  // Makes sure that the .Orig is always 4 digits long.
         hex[3] = hex[2];
         hex[2] = hex[1];
         hex[1] = hex[0];
