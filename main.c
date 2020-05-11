@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
 #include <string.h>
 
 // Defining all of the registers
@@ -18,6 +18,7 @@
 #define ST "0111"
 #define LDR "0110"
 #define BR "0000"
+#define AND "0101"
 
 // Defining the offsets
 #define NOTOFFSET "111111"
@@ -49,7 +50,11 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", ADD);
         numberOfOperands = 3;
         offset = 5;
-    } else if (strcmp(opt, "LD") == 0) {
+    } else if (strcmp(opt, "AND") == 0) {
+         sprintf(transOpt, "%s", AND);
+         numberOfOperands = 3;
+         offset = 5;
+     } else if (strcmp(opt, "LD") == 0) {
         sprintf(transOpt, "%s", LD);
         numberOfOperands = 2;
         offset = 9;
@@ -72,7 +77,7 @@ void operatorTranslater(char opt[]) {
         strcat(output, transOpt);
         return;
     }
-    strcpy(output, transOpt);
+     strcpy(output, transOpt);
 }
 
 void determineBR(char *opt) {
@@ -149,6 +154,18 @@ void checkADD(int i) {
     }
 }
 
+// Checks for immediate or register version of add
+ void checkAND(int i) {
+     if (strcmp(operator, "AND") == 0 && i == 2) {
+         if (operand[i][0] == 'R') {
+             strcat(output, "000");
+         } else if (operand[i][0] == '#') {
+             strcat(output, "1");
+         }
+     }
+ }
+
+
 // Clears all of the character arrays (strings)
 void clear() {
     memset(operator, '\0', sizeof(operator));
@@ -203,7 +220,8 @@ int main(void) {
 
         // Loop to translate the operands
         for (int l = 0; l < numberOfOperands; ++l) {
-            checkADD(l);
+            checkADD (l);
+            //checkAND(1);
             operandTranslater(operand[l]);
         }
 
