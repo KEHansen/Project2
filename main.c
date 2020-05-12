@@ -81,6 +81,7 @@ void operatorTranslater(char opt[]) {
         offset = 6;
     } else if (strcmp(opt, "JSR") == 0) {
         sprintf(transOpt, "%s", JSR);
+        strcat(transOpt, "1");
         numberOfOperands = 1;
         offset = 11;
     } else if (strcmp(opt,"LDI") == 0) {
