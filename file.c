@@ -33,6 +33,7 @@
 #define readPath "ClionProjects/Project2/tmp/assemblycode.txt"
 #define writePath "ClionProjects/Project2/tmp/machinecode.txt"
 
+char buff[256];
 char operator[8];
 char operand[3][8];
 char transOpt[4];
@@ -69,7 +70,9 @@ void BLKW();
 void STRINGZ();
 void setLabel();
 int readLabel(char *opd);
-
+int doesLabelExist();
+void createLabels();
+int searchForLabel();
 
 // Translates the operator and determines the offset and the number of operands for the given operator
 void operatorTranslater(char opt[]) {
@@ -134,18 +137,30 @@ void operatorTranslater(char opt[]) {
     } else if (strcmp(operator, ".END") == 0) {
         return;
     } else {
-        setLabel();
+        fscanf(readFile, "%s", operator);
+        operatorTranslater(operator);
         return;
     }
     strcat(output, transOpt);
 }
 
+// Sets a label with the given name
 void setLabel() {
-    sprintf(labels[numberOfLabels], "%s", operator);
-    labelLine[numberOfLabels] = currentLine;
-    numberOfLabels++;
-    fscanf(readFile, "%s", operator);
-    operatorTranslater(operator);
+    if (!(doesLabelExist())) {
+        sprintf(labels[numberOfLabels], "%s", operator);
+        labelLine[numberOfLabels] = currentLine;
+        numberOfLabels++;
+    }
+}
+
+// Check if a label exist within the program
+int doesLabelExist() {
+    for (int i = 0; i < strlen((const char *) labels); ++i) {
+        if (strcmp(operator, labels[i]) == 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void STRINGZ() {
@@ -185,7 +200,7 @@ void determineBR(char *opt) {
     } else if (strcmp(opt,"BRp") == 0) {
         strcat(transOpt, "001");
     } else if (strcmp(opt,"BR") == 0) {
-        offset = 12;
+        strcat(transOpt, "111");
     }
 }
 
@@ -329,16 +344,17 @@ void hexToBinary(char *opd) {
 // Reads the label and calculates the corresponding number.
 int readLabel(char *opd) {
     int l = 0;
+    int x;
     for (int i = 0; i < strlen((const char *) labels); ++i) {
         if (strcmp(opd,labels[i]) == 0) {
             l = labelLine[i];
             break;
         }
     }
-    if (l != 0) {
+    if (l < currentLine) {
         return l - (currentLine + 1);
     }
-    return 0;
+    return l;
 }
 
 // Checks for immediate or register version of ADD or AND
@@ -363,6 +379,7 @@ void clear() {
     memset(decimal, '\0', sizeof(decimal));
     memset(hex, '\0', sizeof(hex));
     memset(output, '\0', sizeof(output));
+    memset(buff, '\0', sizeof(buff));
     numberOfOperands = 0;
     offset = 0;
 }
@@ -384,8 +401,45 @@ void closeFiles() {
     fclose(writeFile);
 }
 
+void createLabels() {
+    openFiles();
+    while (1) {
+        clear();
+        fscanf(readFile, "%s", operator);
+        if (strcmp(operator, "") == 0) { // Has reached the end of the program
+            closeFiles();
+            currentLine = 0;
+            return;
+        }
+        if (searchForLabel()) {
+            currentLine++;
+        }
+    }
+}
+
+int searchForLabel() {
+    if (strcmp(operator, ".ORIG") == 0 || strcmp(operator, ".FILL") == 0 || strcmp(operator, ".BLKW") == 0 || strcmp(operator, ".STRINGZ") == 0) {
+        fgets(buff, sizeof(buff), readFile);
+    } else if (strcmp(operator, "ADD") == 0 || strcmp(operator, "AND") == 0 || strcmp(operator, "NOT") == 0) {
+        fgets(buff, sizeof(buff), readFile);
+    } else if (strcmp(operator, "LD") == 0 || strcmp(operator, "LDI") == 0 || strcmp(operator, "LDR") == 0) {
+        fgets(buff, sizeof(buff), readFile);
+    } else if (strcmp(operator, "ST") == 0 || strcmp(operator, "STI") == 0 || strcmp(operator, "STR") == 0) {
+        fgets(buff, sizeof(buff), readFile);
+    } else if (strcmp(operator, "JSR") == 0 || (operator[0] == 'B' && operator[1] == 'R')) {
+        fgets(buff, sizeof(buff), readFile);
+    } else if (strcmp(operator, ".END") == 0) {
+        return 0;
+    } else {
+        setLabel();
+        return 0;
+    }
+    return 1;
+}
+
 int main(void) {
 
+    createLabels();
     openFiles();
 
     while (1) {
