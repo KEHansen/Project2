@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
-
 char testResult[1024] = "0011000000000000\n"
                         "0001001001000010\n"
                         "0001010010100010\n"
