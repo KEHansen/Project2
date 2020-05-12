@@ -33,7 +33,7 @@ char testResult[1024] = "0011000000000000\n"
                         "0000000000000000";
 
 char ourResult[1024] = "0011000000000000\n"
-                       "0001001001000010\n"
+                        "0001001001000010\n"
                        "0001010010111011\n"
                        "0101001001000010\n"
                        "0101001001100000\n"
@@ -65,9 +65,9 @@ char ourResult[1024] = "0011000000000000\n"
 int main() {
 
     if (strcmp(testResult, ourResult) == 0) {
-        printf("De er ens!");
+        printf("They are identical!");
     } else {
-        printf("!!!!");
+        printf("They are NOT identical");
     }
     return 0;
 }

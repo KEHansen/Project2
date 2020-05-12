@@ -17,6 +17,7 @@
 #define LD "0010"
 #define LDR "0110"
 #define LDI "1010"
+#define LEA "1110"
 #define NOT "1001"
 #define ST "0011"
 #define STR "0111"
@@ -94,6 +95,10 @@ void operatorTranslater(char opt[]) {
         offset = 6;
     } else if (strcmp(opt,"LDI") == 0) {
         sprintf(transOpt, "%s", LDI);
+        numberOfOperands = 2;
+        offset = 9;
+    } else if (strcmp(opt,"LEA") == 0) {
+        sprintf(transOpt, "%s", LEA;
         numberOfOperands = 2;
         offset = 9;
     } else if (strcmp(opt, "NOT") == 0) {
@@ -422,7 +427,7 @@ int searchForLabel() {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, "ADD") == 0 || strcmp(operator, "AND") == 0 || strcmp(operator, "NOT") == 0) {
         fgets(buff, sizeof(buff), readFile);
-    } else if (strcmp(operator, "LD") == 0 || strcmp(operator, "LDI") == 0 || strcmp(operator, "LDR") == 0) {
+    } else if (strcmp(operator, "LD") == 0 || strcmp(operator, "LDI") == 0 || strcmp(operator, "LDR") == 0 || strcmp(operator, "LEA") == 0) {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, "ST") == 0 || strcmp(operator, "STI") == 0 || strcmp(operator, "STR") == 0) {
         fgets(buff, sizeof(buff), readFile);
