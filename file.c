@@ -23,6 +23,7 @@
 #define STR "0111"
 #define STI "1011"
 #define JSR "0100"
+#define RET "1100000111000000"
 #define BR "0000"
 
 // Defining the offsets
@@ -98,7 +99,7 @@ void operatorTranslater(char opt[]) {
         numberOfOperands = 2;
         offset = 9;
     } else if (strcmp(opt,"LEA") == 0) {
-        sprintf(transOpt, "%s", LEA;
+        sprintf(transOpt, "%s", LEA);
         numberOfOperands = 2;
         offset = 9;
     } else if (strcmp(opt, "NOT") == 0) {
@@ -121,6 +122,8 @@ void operatorTranslater(char opt[]) {
         strcat(transOpt, "1");
         numberOfOperands = 1;
         offset = 11;
+    } else if (strcmp(opt, "RET") == 0) {
+        sprintf(transOpt, "%s", RET);
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
         numberOfOperands = 1;
@@ -349,17 +352,16 @@ void hexToBinary(char *opd) {
 // Reads the label and calculates the corresponding number.
 int readLabel(char *opd) {
     int l = 0;
-    int x;
     for (int i = 0; i < strlen((const char *) labels); ++i) {
         if (strcmp(opd,labels[i]) == 0) {
             l = labelLine[i];
             break;
         }
     }
-    if (l < currentLine) {
+    if (l != 0) {
         return l - (currentLine + 1);
     }
-    return l;
+    return 0;
 }
 
 // Checks for immediate or register version of ADD or AND
