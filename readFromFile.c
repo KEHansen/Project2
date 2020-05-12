@@ -17,11 +17,13 @@
 #define LD "0010"
 #define LDR "0110"
 #define LDI "1010"
+#define LEA "1110"
 #define NOT "1001"
 #define ST "0011"
 #define STR "0111"
 #define STI "1011"
 #define JSR "0100"
+#define RET "1100000111000000"
 #define BR "0000"
 
 // Defining the offsets
@@ -96,6 +98,10 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", LDI);
         numberOfOperands = 2;
         offset = 9;
+    } else if (strcmp(opt,"LEA") == 0) {
+        sprintf(transOpt, "%s", LEA);
+        numberOfOperands = 2;
+        offset = 9;
     } else if (strcmp(opt, "NOT") == 0) {
         sprintf(transOpt, "%s", NOT);
         numberOfOperands = 2;
@@ -116,6 +122,8 @@ void operatorTranslater(char opt[]) {
         strcat(transOpt, "1");
         numberOfOperands = 1;
         offset = 11;
+    } else if (strcmp(opt, "RET") == 0) {
+        sprintf(transOpt, "%s", RET);
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
         numberOfOperands = 1;
@@ -344,17 +352,16 @@ void hexToBinary(char *opd) {
 // Reads the label and calculates the corresponding number.
 int readLabel(char *opd) {
     int l = 0;
-    int x;
     for (int i = 0; i < strlen((const char *) labels); ++i) {
         if (strcmp(opd,labels[i]) == 0) {
             l = labelLine[i];
             break;
         }
     }
-    if (l < currentLine) {
+    if (l != 0) {
         return l - (currentLine + 1);
     }
-    return l;
+    return 0;
 }
 
 // Checks for immediate or register version of ADD or AND
@@ -422,7 +429,7 @@ int searchForLabel() {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, "ADD") == 0 || strcmp(operator, "AND") == 0 || strcmp(operator, "NOT") == 0) {
         fgets(buff, sizeof(buff), readFile);
-    } else if (strcmp(operator, "LD") == 0 || strcmp(operator, "LDI") == 0 || strcmp(operator, "LDR") == 0) {
+    } else if (strcmp(operator, "LD") == 0 || strcmp(operator, "LDI") == 0 || strcmp(operator, "LDR") == 0 || strcmp(operator, "LEA") == 0) {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, "ST") == 0 || strcmp(operator, "STI") == 0 || strcmp(operator, "STR") == 0) {
         fgets(buff, sizeof(buff), readFile);
