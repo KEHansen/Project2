@@ -13,16 +13,19 @@
 
 // Defining the assembly instructions
 #define ADD "0001"
+#define AND "0101"
 #define LD "0010"
-#define NOT "1001"
-#define ST "0111"
 #define LDR "0110"
+#define LDI "1010"
+#define NOT "1001"
+#define ST "0011"
+#define STR "0111"
+#define STI "1011"
+#define JSR "0100"
 #define BR "0000"
 
 // Defining the offsets
 #define NOTOFFSET "111111"
-#define OFFSET6 "000000"
-#define PCOFFSET9 "000000000"
 #define END "0000000000000000"
 
 // Defining file paths
@@ -51,6 +54,7 @@ int currentLine = 0;
 int numberOfLabels = 0;
 int labelJump;
 
+// Paths
 char readFilePath[100];
 char writeFilePath[100];
 
@@ -73,8 +77,20 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", ADD);
         numberOfOperands = 3;
         offset = 5;
+    } else if (strcmp(opt, "AND") == 0) {
+        sprintf(transOpt, "%s", AND);
+        numberOfOperands = 3;
+        offset = 5;
     } else if (strcmp(opt, "LD") == 0) {
         sprintf(transOpt, "%s", LD);
+        numberOfOperands = 2;
+        offset = 9;
+    } else if (strcmp(opt, "LDR") == 0) {
+        sprintf(transOpt, "%s", LDR);
+        numberOfOperands = 3;
+        offset = 6;
+    } else if (strcmp(opt,"LDI") == 0) {
+        sprintf(transOpt, "%s", LDI);
         numberOfOperands = 2;
         offset = 9;
     } else if (strcmp(opt, "NOT") == 0) {
@@ -84,10 +100,19 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", ST);
         numberOfOperands = 2;
         offset = 9;
-    } else if (strcmp(opt, "LDR") == 0) {
-        sprintf(transOpt, "%s", LDR);
+    } else if (strcmp(opt, "STR") == 0) {
+        sprintf(transOpt, "%s", STR);
         numberOfOperands = 3;
         offset = 6;
+    } else if (strcmp(opt, "STI") == 0) {
+        sprintf(transOpt, "%s", STI);
+        numberOfOperands = 2;
+        offset = 9;
+    } else if (strcmp(opt, "JSR") == 0) {
+        sprintf(transOpt, "%s", JSR);
+        strcat(transOpt, "1");
+        numberOfOperands = 1;
+        offset = 11;
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
         numberOfOperands = 1;
@@ -106,9 +131,8 @@ void operatorTranslater(char opt[]) {
     } else if (strcmp(operator, ".STRINGZ") == 0) {
         offset = 16;
         STRINGZ();
-        return;
     } else if (strcmp(operator, ".END") == 0) {
-        sprintf(transOpt, "%s", END);
+        return;
     } else {
         setLabel();
         return;
@@ -136,12 +160,13 @@ void STRINGZ() {
             j++;
         }
     }
-    decimalToBinary((int)stringzReady[0]);
-    for (int i = 1; i < strlen(stringzReady); ++i) {
-        fprintf(writeFile, "%s\n", output);
-        memset(output, '\0', sizeof(output));
+    for (int i = 0; i < strlen(stringzReady); ++i) {
         decimalToBinary((int)stringzReady[i]);
+        fprintf(writeFile, "%s\n", output);
+        currentLine++;
+        memset(output, '\0', sizeof(output));
     }
+    sprintf(transOpt, "%s", END);
 }
 
 void determineBR(char *opt) {
@@ -316,9 +341,9 @@ int readLabel(char *opd) {
     return 0;
 }
 
-// Checks for immediate or register version of add
-void checkADD(int i) {
-    if (strcmp(operator, "ADD") == 0 && i == 2) {
+// Checks for immediate or register version of ADD or AND
+void checkADD_AND(int i) {
+    if ((strcmp(operator, "ADD") == 0 || strcmp(operator, "AND") == 0) && i == 2) {
         if (operand[i][0] == 'R') {
             strcat(output, "000");
         } else if (operand[i][0] == '#') {
@@ -383,7 +408,7 @@ int main(void) {
 
         // Loop to translate the operands
         for (int i = 0; i < numberOfOperands; ++i) {
-            checkADD(i);
+            checkADD_AND(i);
             operandTranslater(operand[i]);
         }
 
