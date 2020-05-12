@@ -19,13 +19,14 @@
 #define LDR "0110"
 #define BR "0000"
 #define AND "0101"
+#define STI "1011"
+#define STR "0111"
+#define JSR "0100"
 
 // Defining the offsets
 #define NOTOFFSET "111111"
 #define OFFSET6 "000000"
 #define PCOFFSET9 "000000000"
-
-
 
 
 char operator[8];
@@ -65,10 +66,22 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", ST);
         numberOfOperands = 2;
         offset = 9;
+    } else if (strcmp(opt, "STI") == 0) {
+        sprintf(transOpt, "%s", STI);
+        numberOfOperands = 2;
+        offset = 9;
+    } else if (strcmp(opt, "STR") == 0) {
+        sprintf(transOpt, "%s", STR);
+        numberOfOperands = 3;
+        offset = 6;
     } else if (strcmp(opt, "LDR") == 0) {
         sprintf(transOpt, "%s", LDR);
         numberOfOperands = 3;
         offset = 6;
+    } else if (strcmp(opt, "JSR") == 0) {
+        sprintf(transOpt, "%s", JSR);
+        numberOfOperands = 1;
+        offset = 11;
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
         strcpy(output, transOpt);
