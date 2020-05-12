@@ -65,9 +65,9 @@ char ourResult[1024] = "0011000000000000\n"
 int main() {
 
     if (strcmp(testResult, ourResult) == 0) {
-        printf("De er ens!");
+        printf("They are identical!");
     } else {
-        printf("!!!!");
+        printf("They are NOT identical");
     }
     return 0;
 }
