@@ -22,6 +22,7 @@
 #define STI "1011"
 #define STR "0111"
 #define JSR "0100"
+#define LDI "1010"
 
 // Defining the offsets
 #define NOTOFFSET "111111"
@@ -82,6 +83,10 @@ void operatorTranslater(char opt[]) {
         sprintf(transOpt, "%s", JSR);
         numberOfOperands = 1;
         offset = 11;
+    } else if (strcmp(opt,"LDI") == 0) {
+        sprintf(transOpt, "%s", LDI);
+        numberOfOperands = 2;
+        offset = 9;
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
         strcpy(output, transOpt);
