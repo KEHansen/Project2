@@ -433,7 +433,7 @@ int searchForLabel() {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, "ST") == 0 || strcmp(operator, "STI") == 0 || strcmp(operator, "STR") == 0) {
         fgets(buff, sizeof(buff), readFile);
-    } else if (strcmp(operator, "JSR") == 0 || (operator[0] == 'B' && operator[1] == 'R')) {
+    } else if (strcmp(operator, "JSR") == 0 || strcmp(operator, "RET") == 0 || (operator[0] == 'B' && operator[1] == 'R')) {
         fgets(buff, sizeof(buff), readFile);
     } else if (strcmp(operator, ".END") == 0) {
         return 0;
