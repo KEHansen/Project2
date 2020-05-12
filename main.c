@@ -66,13 +66,13 @@ void operatorTranslater(char opt[]) {
         offset = 6;
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
-        strcpy(output, transOpt);
+        strcat(output, transOpt);
         determineBR(opt);
         sprintf(transOpt, "%s", PCOFFSET9);
         strcat(output, transOpt);
         return;
     }
-    strcpy(output, transOpt);
+    strcat(output, transOpt);
 }
 
 void determineBR(char *opt) {

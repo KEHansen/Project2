@@ -26,7 +26,7 @@
 #define END "0000000000000000"
 
 // Defining file paths
-#define personalPath "C:/Users/Simon Fridolf/" // Remember to change to personal path
+#define personalPath "C:/Users/kehan_000/" // Remember to change to personal path
 #define readPath "ClionProjects/Project2/tmp/assemblycode.txt"
 #define writePath "ClionProjects/Project2/tmp/machinecode.txt"
 
@@ -40,11 +40,16 @@ char output[17];
 char Sblkw[8];
 char stringz[64];
 char stringzReady[64];
+char labels[16][16];
+int labelLine[16];
 
 int numberOfOperands;
 int offset;
 int Nblkw;
 int decimalNumber;
+int currentLine = 0;
+int numberOfLabels = 0;
+int labelJump;
 
 char readFilePath[100];
 char writeFilePath[100];
@@ -54,14 +59,13 @@ FILE *writeFile;
 
 
 void determineBR(char *opt);
-
 void decimalToBinary(int n);
-
 void hexToBinary(char *opd);
-
 void BLKW();
-
 void STRINGZ();
+void setLabel();
+int readLabel(char *opd);
+
 
 // Translates the operator and determines the offset and the number of operands for the given operator
 void operatorTranslater(char opt[]) {
@@ -86,11 +90,9 @@ void operatorTranslater(char opt[]) {
         offset = 6;
     } else if (opt[0] == 'B' && opt[1] == 'R') {
         sprintf(transOpt, "%s", BR);
-        strcpy(output, transOpt);
+        numberOfOperands = 1;
+        offset = 9;
         determineBR(opt);
-        sprintf(transOpt, "%s", PCOFFSET9);
-        strcat(output, transOpt);
-        return;
 
         /* The additional assembler directives that needs to be implemented in order to communicate with an LC3
             assembler file */
@@ -107,8 +109,19 @@ void operatorTranslater(char opt[]) {
         return;
     } else if (strcmp(operator, ".END") == 0) {
         sprintf(transOpt, "%s", END);
+    } else {
+        setLabel();
+        return;
     }
-    strcpy(output, transOpt);
+    strcat(output, transOpt);
+}
+
+void setLabel() {
+    sprintf(labels[numberOfLabels], "%s", operator);
+    labelLine[numberOfLabels] = currentLine;
+    numberOfLabels++;
+    fscanf(readFile, "%s", operator);
+    operatorTranslater(operator);
 }
 
 void STRINGZ() {
@@ -133,21 +146,21 @@ void STRINGZ() {
 
 void determineBR(char *opt) {
     if (strcmp(opt,"BRnzp") == 0) {
-        strcat(output, "111");
+        strcat(transOpt, "111");
     } else if (strcmp(opt,"BRnz") == 0) {
-        strcat(output, "110");
+        strcat(transOpt, "110");
     } else if (strcmp(opt,"BRnp") == 0) {
-        strcat(output, "101");
+        strcat(transOpt, "101");
     } else if (strcmp(opt,"BRzp") == 0) {
-        strcat(output, "011");
+        strcat(transOpt, "011");
     } else if (strcmp(opt,"BRn") == 0) {
-        strcat(output, "100");
+        strcat(transOpt, "100");
     } else if (strcmp(opt,"BRz") == 0) {
-        strcat(output, "010");
+        strcat(transOpt, "010");
     } else if (strcmp(opt,"BRp") == 0) {
-        strcat(output, "001");
+        strcat(transOpt, "001");
     } else if (strcmp(opt,"BR") == 0) {
-        strcat(output, "000");
+        offset = 12;
     }
 }
 
@@ -164,7 +177,7 @@ void BLKW() {
     }
 }
 
-// Translates the operands to
+// Translates the operands
 void operandTranslater(char opd[]) {
     if (strcmp(opd, "R0") == 0) {
         sprintf(transOpd, "%s", R0);
@@ -188,10 +201,11 @@ void operandTranslater(char opd[]) {
         }
         sscanf(decimal, "%d", &decimalNumber); // Converts the string to an integer
         decimalToBinary(decimalNumber);
-        return;
     } else if (opd[0] == 'x') {
         hexToBinary(opd);
-        return;
+    } else {
+        labelJump = readLabel(opd);
+        decimalToBinary(labelJump);
     }
     strcat(output, transOpd);
 }
@@ -210,7 +224,8 @@ void decimalToBinary(int n) {
             strcat(output, "0");
     }
 }
-// Function that translate hex to binary
+
+// Converts hex to binary
 void hexToBinary(char *opd) {
 
     for (int i = 1; i < strlen(opd); ++i) { // Removes the x from the .Orig
@@ -229,61 +244,76 @@ void hexToBinary(char *opd) {
         switch(hex[i])
         {
             case '0':
-                strcat(output, "0000");
+                strcat(transOpd, "0000");
                 break;
             case '1':
-                strcat(output, "0001");
+                strcat(transOpd, "0001");
                 break;
             case '2':
-                strcat(output, "0010");
+                strcat(transOpd, "0010");
                 break;
             case '3':
-                strcat(output, "0011");
+                strcat(transOpd, "0011");
                 break;
             case '4':
-                strcat(output, "0100");
+                strcat(transOpd, "0100");
                 break;
             case '5':
-                strcat(output, "0101");
+                strcat(transOpd, "0101");
                 break;
             case '6':
-                strcat(output, "0110");
+                strcat(transOpd, "0110");
                 break;
             case '7':
-                strcat(output, "0111");
+                strcat(transOpd, "0111");
                 break;
             case '8':
-                strcat(output, "1000");
+                strcat(transOpd, "1000");
                 break;
             case '9':
-                strcat(output, "1001");
+                strcat(transOpd, "1001");
                 break;
             case 'a':
             case 'A':
-                strcat(output, "1010");
+                strcat(transOpd, "1010");
                 break;
             case 'b':
             case 'B':
-                strcat(output, "1011");
+                strcat(transOpd, "1011");
                 break;
             case 'c':
             case 'C':
-                strcat(output, "1100");
+                strcat(transOpd, "1100");
                 break;
             case 'd':
             case 'D':
-                strcat(output, "1101");
+                strcat(transOpd, "1101");
                 break;
             case 'e':
             case 'E':
-                strcat(output, "1110");
+                strcat(transOpd, "1110");
                 break;
             case 'f':
             case 'F':
-                strcat(output, "1111");
+                strcat(transOpd, "1111");
                 break;
         }
     }
+}
+
+// Reads the label and calculates the corresponding number.
+int readLabel(char *opd) {
+    int l = 0;
+    for (int i = 0; i < strlen((const char *) labels); ++i) {
+        if (strcmp(opd,labels[i]) == 0) {
+            l = labelLine[i];
+            break;
+        }
+    }
+    if (l != 0) {
+        return l - (currentLine + 1);
+    }
+    return 0;
 }
 
 // Checks for immediate or register version of add
@@ -297,7 +327,7 @@ void checkADD(int i) {
     }
 }
 
-// Clears all of the character arrays (strings)
+// Clears all of the character arrays (strings) and resets integer values to zero
 void clear() {
     memset(operator, '\0', sizeof(operator));
     memset(operand[0], '\0', sizeof(operand[0]));
@@ -312,6 +342,7 @@ void clear() {
     offset = 0;
 }
 
+// Opens the two files
 void openFiles() {
     strcpy(readFilePath, personalPath);
     strcat(readFilePath, readPath);
@@ -322,6 +353,7 @@ void openFiles() {
     writeFile = fopen(writeFilePath, "w");
 }
 
+// Closes the two files
 void closeFiles() {
     fclose(readFile);
     fclose(writeFile);
@@ -366,5 +398,6 @@ int main(void) {
 
         // Prints the final machine code
         fprintf(writeFile, "%s\n", output);
+        currentLine++;
     }
 }
